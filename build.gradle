@@ -4,8 +4,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
-        classpath 'com.novoda:bintray-release:0.3.4'
+        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.novoda:bintray-release:0.5.0'
     }
 }
 
@@ -18,8 +18,7 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 23
-    buildToolsVersion = "23.0.3"
+    compileSdkVersion = 236
     supportLibVersion = "23.3.0"
 }
 
