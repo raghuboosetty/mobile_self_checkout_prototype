@@ -26,6 +26,9 @@ android {
     realm {
         syncEnabled true
     }
+    dexOptions {
+        preDexLibraries false
+    }
 }
 
 dependencies {
