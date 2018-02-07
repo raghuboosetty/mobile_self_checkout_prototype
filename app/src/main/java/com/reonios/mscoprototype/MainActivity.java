@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 //                        TODO: find the different types of codes to scan. 5 is just assumed number.
                         if (barcodeResult.rawValue.length() > 5) {
 //                            result.setText(barcode.rawValue);
-                            getDetails(barcodeResult.rawValue);
+                            getBarcodeDetails(barcodeResult.rawValue);
                         }
                         else Toast.makeText(MainActivity.this, "Invalid Scan! Please place the barcode parallel to camera.", Toast.LENGTH_SHORT).show();
                     }
@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Retrofit API and cart functionality
      */
-    void getDetails(String barcodeRaw) {
+    void getBarcodeDetails(String barcodeRaw) {
         final String resBarcode = barcodeRaw;
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -229,6 +229,42 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Retrofit API and BLE functionality
+     */
+    void getCustomerDetails(String beaconUuidRaw) {
+        final String resBeaconUuid = beaconUuidRaw;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestApi service = retrofit.create(RestApi.class);
+        Call<Beacon> call = service.getBeaconDetails(resBeaconUuid);
+
+        call.enqueue(new Callback<Beacon>() {
+            @Override
+            public void onResponse(Call<Beacon> call, Response<Beacon> response) {
+                try {
+                    String resBeaconUuid = response.body().getUuid();
+                    String resBeaconMessage = response.body().getMessage();
+
+                    Log.d("POST BEACON API: ","UUID:" + resBeaconUuid + " Message: " + resBeaconMessage);
+
+                    Beacon beacon = new Beacon(resBeaconUuid,resBeaconMessage);
+                    TextView bleAd = (TextView) findViewById(R.id.bleAd);
+                    bleAd.setVisibility(View.VISIBLE);
+                    bleAd.setText( beacon.getMessage() + "\n Check out our new Offers!");
+
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Item Not Found! Contact Sales Team.", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onFailure(Call<Beacon> call, Throwable t) {}
+        });
+    }
 
     /**
      * Bluetooth LE Scanner
@@ -236,7 +272,6 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
         public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-            TextView bleAd = (TextView) findViewById(R.id.bleAd);
             int startByte = 2;
             boolean patternFound = false;
             while (startByte <= 5) {
@@ -267,8 +302,7 @@ public class MainActivity extends AppCompatActivity {
                 final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
                 Log.i(LOG_TAG, "UUID: " + uuid + "\\nmajor: " + major + "\\nminor" + minor);
-                bleAd.setVisibility(View.VISIBLE);
-                bleAd.setText("Welcome to MSCO! \n Check out our new Offers!");
+                getCustomerDetails(uuid);
             }
         }
     };

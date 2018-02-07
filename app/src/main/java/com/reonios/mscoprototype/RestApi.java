@@ -10,4 +10,7 @@ import retrofit2.http.Path;
 public interface RestApi {
     @GET("locate/{id}/barcode")
     Call<Product> getProductDetails(@Path("id") String barcode);
+
+    @GET("locate/{id}/beacon")
+    Call<Beacon> getBeaconDetails(@Path("id") String uuid);
 }
