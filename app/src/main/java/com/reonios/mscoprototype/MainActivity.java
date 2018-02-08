@@ -47,8 +47,6 @@ import static junit.framework.Assert.assertNotNull;
 public class MainActivity extends AppCompatActivity {
 //  Restro fit API
     public static final String BASE_URL = "https://msco.herokuapp.com/api/";
-//    public static final String BARCODE_KEY = "BARCODE";
-//    private Barcode barcodeResult;
 
 //  Bluetooth LE Scanner
     private BluetoothManager btManager;
@@ -70,12 +68,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView bleImageAd5;
 
     HashMap<String,Object[]> cartHashMap = new HashMap<>();
-
-////  Cart items
-//    ListView listView;
-//    ArrayList<Product> itemProductList;
-//    CustomAdapter customAdapter;
-//    Cart cart;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -100,15 +92,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-////      Cart Elements
-//        TextView tvTotal = (TextView) findViewById(R.id.total);
-//        listView = (ListView) findViewById(R.id.listview);
-//        itemProductList = new ArrayList<>();
-//        customAdapter = new CustomAdapter(getApplicationContext(), itemProductList, tvTotal);
-//        listView.setEmptyView(findViewById(android.R.id.empty));
-//        listView.setAdapter(customAdapter);
-//        cart = new Cart(customAdapter,itemProductList,tvTotal);
-
 //      Permissions for Bluetooth, Location and Camera
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Android M Permission check
@@ -118,13 +101,6 @@ public class MainActivity extends AppCompatActivity {
             } else { initMsco(); }
         } else { initMsco(); }
 
-//        if(savedInstanceState != null){
-//            Barcode restoredBarcode = savedInstanceState.getParcelable(BARCODE_KEY);
-//            if(restoredBarcode != null){
-////                tvBarcode.setText(restoredBarcode.rawValue);
-//                barcodeResult = restoredBarcode;
-//            }
-//        }
     }
 
     @Override
@@ -159,49 +135,7 @@ public class MainActivity extends AppCompatActivity {
         }
         scanHandler.post(scanRunnable);
 
-////      Barcode Scanner
-//        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        assertNotNull(fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                startScan();
-//            }
-//        });
     }
-
-//    private void startScan() {
-//        /**
-//         * Build a new MaterialBarcodeScanner
-//         */
-//        final MaterialBarcodeScanner materialBarcodeScanner = new MaterialBarcodeScannerBuilder()
-//                .withActivity(MainActivity.this)
-//                .withEnableAutoFocus(true)
-//                .withBleepEnabled(true)
-//                .withBackfacingCamera()
-//                .withCenterTracker()
-//                .withText("Scanning...")
-//                .withResultListener(new MaterialBarcodeScanner.OnResultListener() {
-//                    @Override
-//                    public void onResult(Barcode barcode) {
-//                        barcodeResult = barcode;
-////                        TODO: find the different types of codes to scan. 5 is just assumed number.
-//                        if (barcodeResult.rawValue.length() > 5) {
-////                            result.setText(barcode.rawValue);
-//                            getBarcodeDetails(barcodeResult.rawValue);
-//                        }
-//                        else Toast.makeText(MainActivity.this, "Invalid Scan! Please place the barcode parallel to camera.", Toast.LENGTH_SHORT).show();
-//                    }
-//                })
-//                .build();
-//        materialBarcodeScanner.startScan();
-//    }
-
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState) {
-//        outState.putParcelable(BARCODE_KEY, barcodeResult);
-//        super.onSaveInstanceState(outState);
-//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -243,42 +177,6 @@ public class MainActivity extends AppCompatActivity {
             builder.show();
         } else { initMsco(); }
     }
-
-//    /**
-//     * Retrofit API and cart functionality
-//     */
-//    void getBarcodeDetails(String barcodeRaw) {
-//        final String resBarcode = barcodeRaw;
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(BASE_URL)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
-//
-//        RestApi service = retrofit.create(RestApi.class);
-//        Call<Product> call = service.getProductDetails(resBarcode);
-//
-//        call.enqueue(new Callback<Product>() {
-//            @Override
-//            public void onResponse(Call<Product> call, Response<Product> response) {
-//                try {
-//                    String resPrice = response.body().getPrice();
-//                    String resTitle = response.body().getTitle();
-//                    String resDescription = response.body().getBody();
-//
-//                    Log.d("POST SCAN API: ","Price:" + resPrice + " Title: " + resTitle + " Description: " + resDescription);
-//
-//                    Product scannedProduct = new Product(resBarcode,resPrice,resTitle,resDescription);
-//                    cart.addProduct(scannedProduct);
-//
-//                } catch (Exception e) {
-//                    Toast.makeText(MainActivity.this, "Item Not Found! Contact Sales Team.", Toast.LENGTH_SHORT).show();
-//                    e.printStackTrace();
-//                }
-//            }
-//            @Override
-//            public void onFailure(Call<Product> call, Throwable t) {}
-//        });
-//    }
 
     /**
      * Retrofit API and BLE functionality
