@@ -78,4 +78,13 @@ public class Cart {
         }
         tvTotal.setText(totalCartValue.toString());
     }
+
+    void removeProducts(){
+        Double totalPrice=0.0;
+        Double totalCartValue = 0.0;
+
+        itemProductList.removeAll(itemProductList);
+        customAdapter.notifyDataSetChanged();
+        tvTotal.setText(totalCartValue.toString());
+    }
 }

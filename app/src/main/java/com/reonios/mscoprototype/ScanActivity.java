@@ -97,6 +97,16 @@ public class ScanActivity extends AppCompatActivity {
                 startScan();
             }
         });
+
+        final FloatingActionButton pay = (FloatingActionButton) findViewById(R.id.pay);
+        assertNotNull(pay);
+        pay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cart.removeProducts();
+                Toast.makeText(ScanActivity.this, "Payment Successful!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void startScan() {
