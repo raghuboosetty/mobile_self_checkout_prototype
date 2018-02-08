@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothManager btManager;
     private BluetoothAdapter btAdapter;
     private Handler scanHandler = new Handler();
-    private int scan_interval_ms = 500;
+    private int scan_interval_ms = 50;
     private boolean isScanning = false;
     static final char[] hexArray = "0123456789ABCDEF".toCharArray();
     private static final String LOG_TAG = "MainActivity";
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
 //                  Loading Image from URL
                     Picasso.with(MainActivity.this)
-                            .load("http://www.samplesalesites.com/wp-content/uploads/2010/10/vintage_chanel.jpg")
+                            .load("http://eastgateshopping.co.uk/assets/images/Shops/h-m.jpg")
                             .into(bleImageAd1);
 
                     Picasso.with(MainActivity.this)
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
                             .into(bleImageAd4);
 
                     Picasso.with(MainActivity.this)
-                            .load("http://eastgateshopping.co.uk/assets/images/Shops/h-m.jpg")
+                            .load("http://www.samplesalesites.com/wp-content/uploads/2010/10/vintage_chanel.jpg")
                             .into(bleImageAd5);
 
 //                  https://shopunder.com/blog/wp-content/uploads/2017/08/Prada-Sale.jpg

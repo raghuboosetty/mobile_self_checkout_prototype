@@ -48,31 +48,41 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent" />
         <ImageButton
             android:id="@+id/bleImageAd2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent" />
         <ImageButton
             android:id="@+id/bleImageAd3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent" />
         <ImageButton
             android:id="@+id/bleImageAd4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent" />
         <ImageButton
             android:id="@+id/bleImageAd5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent" />
 
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
