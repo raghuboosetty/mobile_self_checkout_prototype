@@ -7,8 +7,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.os.Build;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +22,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.reonios.msco.MaterialBarcodeScanner;
 import com.reonios.msco.MaterialBarcodeScannerBuilder;
@@ -51,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "MainActivity";
     private static final int ASK_MULTIPLE_PERMISSION_REQUEST_CODE = 1;
 
-    HashMap<String,Object[]> cartHashMap = new HashMap<String,Object[]>();
+    HashMap<String,Object[]> cartHashMap = new HashMap<>();
 
 //  Cart items
     ListView listView;
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 //      Cart Elements
         TextView tvTotal = (TextView) findViewById(R.id.total);
         listView = (ListView) findViewById(R.id.listview);
-        itemProductList = new ArrayList<Product>();
+        itemProductList = new ArrayList<>();
         customAdapter = new CustomAdapter(getApplicationContext(), itemProductList, tvTotal);
         listView.setEmptyView(findViewById(android.R.id.empty));
         listView.setAdapter(customAdapter);
@@ -92,6 +97,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            // launch settings activity
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 //  TODO: User need to give all the permissions to run the app. Instead it should be based on the permission user gave.
 //  Initializes Bluetooth in background and Barcode scanner button
     private void initMsco(){
@@ -190,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             builder.show();
-        } else { initMsco(); return; }
+        } else { initMsco(); }
     }
 
     /**
@@ -233,14 +259,13 @@ public class MainActivity extends AppCompatActivity {
      * Retrofit API and BLE functionality
      */
     void getCustomerDetails(String beaconUuidRaw) {
-        final String resBeaconUuid = beaconUuidRaw;
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         RestApi service = retrofit.create(RestApi.class);
-        Call<Beacon> call = service.getBeaconDetails(resBeaconUuid);
+        Call<Beacon> call = service.getBeaconDetails(beaconUuidRaw);
 
         call.enqueue(new Callback<Beacon>() {
             @Override
@@ -248,13 +273,24 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     String resBeaconUuid = response.body().getUuid();
                     String resBeaconMessage = response.body().getMessage();
+                    String resBeaconLocation = response.body().getLocation();
 
                     Log.d("POST BEACON API: ","UUID:" + resBeaconUuid + " Message: " + resBeaconMessage);
 
-                    Beacon beacon = new Beacon(resBeaconUuid,resBeaconMessage);
+                    Beacon beacon = new Beacon(resBeaconUuid,resBeaconMessage,resBeaconLocation);
                     TextView bleAd = (TextView) findViewById(R.id.bleAd);
+
                     bleAd.setVisibility(View.VISIBLE);
-                    bleAd.setText( beacon.getMessage() + "\n Check out our new Offers!");
+
+                    final SharedPreferences mSharedPreference= PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                    String name = (mSharedPreference.getString("example_text", "Your Name"));
+
+                    String offersMessage = "Hey " + ", Welcome to " + beacon.getLocation() + "\n Check out our new Offers!";
+                    if (name != "Your Name") {
+                        offersMessage = "Hey " + name + ", Welcome to " + beacon.getLocation() + "\n Check out our new Offers!";
+                    }
+
+                    bleAd.setText( offersMessage );
 
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "Item Not Found! Contact Sales Team.", Toast.LENGTH_SHORT).show();
@@ -333,4 +369,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return new String(hexChars);
     }
+
 }

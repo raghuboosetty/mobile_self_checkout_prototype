@@ -21,6 +21,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <!--<include layout="@layout/content_main"/>-->
+    <!--<include layout="@menu/menu_main"/>-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,13 +42,13 @@
             android:background="@color/common_google_signin_btn_text_dark_focused"
 
             android:clickable="true"
-            android:onClick="close_banner"
             android:visibility="gone" />
+            <!--android:onClick="close_banner"-->
 
         <ListView
             android:id="@+id/listview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:dividerHeight="2dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />

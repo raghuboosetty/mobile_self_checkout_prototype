@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="MSCO"
+        android:text="@string/app_splash_title"
         android:textAlignment="center"
         android:textColor="#fff"
         android:textSize="40sp"
@@ -19,9 +19,9 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="*Prototype"
+        android:text="@string/app_splash_sub_title"
         android:textAlignment="center"
         android:textColor="#fff"
-        android:textSize="10sp"
+        android:textSize="12sp"
         android:textStyle="bold" />
 </LinearLayout>

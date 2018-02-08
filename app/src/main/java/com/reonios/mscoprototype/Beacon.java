@@ -16,22 +16,31 @@ public class Beacon {
     @Expose
     private String message;
 
-    public Beacon(String uuid, String message) {
+    @SerializedName("location")
+    @Expose
+    private String location;
+
+    Beacon(String uuid, String message, String location) {
         this.uuid = uuid;
         this.message = message;
+        this.location = location;
     }
 
-    public String getUuid() {
+    String getUuid() {
         return uuid;
     }
 
     public void setBeaconUuid(String uuid) { this.uuid = uuid; }
 
-    public String getMessage() {
-        return message;
-    }
+    String getMessage() { return message; }
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    String getLocation() { return location; }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }
