@@ -4,6 +4,8 @@
     <string name="app_splash_sub_title">*Prototype</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_scan">Scan and Shop</string>
+
 
     <!-- Strings related to Settings -->
 

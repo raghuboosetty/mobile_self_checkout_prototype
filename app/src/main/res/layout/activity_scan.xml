@@ -1,24 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.reonios.mscoprototype.ScanActivity">
+</android.support.constraint.ConstraintLayout-->
+
+
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
-
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
+    tools:context="com.reonios.mscoprototype.ScanActivity">
 
     <!--<include layout="@layout/content_main"/>-->
     <!--<include layout="@menu/menu_main"/>-->
@@ -29,52 +25,7 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
-            android:id="@+id/bleAd"
-            android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:gravity="center"
-            android:text=""
-            android:textAlignment="center"
-            android:textColor="@color/colorWhite"
-            android:textSize="21sp"
-            android:background="@color/colorAmber"
-
-            android:clickable="true"
-            android:visibility="gone" />
-            <!--android:onClick="close_banner"-->
-        <ImageButton
-            android:id="@+id/bleImageAd1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
-        <ImageButton
-            android:id="@+id/bleImageAd2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
-        <ImageButton
-            android:id="@+id/bleImageAd3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
-        <ImageButton
-            android:id="@+id/bleImageAd4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
-        <ImageButton
-            android:id="@+id/bleImageAd5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitStart"
-            android:adjustViewBounds="true" />
-
-        <!--ListView
+        <ListView
             android:id="@+id/listview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -114,11 +65,11 @@
 
             </TableRow>
             <TableRow android:id="@+id/tableRow3" />
-        </TableLayout-->
+        </TableLayout>
 
     </LinearLayout>
 
-    <!--android.support.design.widget.FloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -140,6 +91,6 @@
         android:textSize="18dp"
         android:textColor="#fff"
         app:layout_anchor="@id/pay"
-        app:layout_anchorGravity="center"/-->
+        app:layout_anchorGravity="center"/>
 
 </android.support.design.widget.CoordinatorLayout>

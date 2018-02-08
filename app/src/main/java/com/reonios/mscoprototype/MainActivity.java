@@ -17,8 +17,11 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +31,7 @@ import android.view.MenuItem;
 import com.reonios.msco.MaterialBarcodeScanner;
 import com.reonios.msco.MaterialBarcodeScannerBuilder;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,8 +47,8 @@ import static junit.framework.Assert.assertNotNull;
 public class MainActivity extends AppCompatActivity {
 //  Restro fit API
     public static final String BASE_URL = "https://msco.herokuapp.com/api/";
-    public static final String BARCODE_KEY = "BARCODE";
-    private Barcode barcodeResult;
+//    public static final String BARCODE_KEY = "BARCODE";
+//    private Barcode barcodeResult;
 
 //  Bluetooth LE Scanner
     private BluetoothManager btManager;
@@ -56,29 +60,54 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "MainActivity";
     private static final int ASK_MULTIPLE_PERMISSION_REQUEST_CODE = 1;
 
+
+//  Declaring our ImageView
+//  TODO: use lists instead of individual ImageView
+    private ImageView bleImageAd1;
+    private ImageView bleImageAd2;
+    private ImageView bleImageAd3;
+    private ImageView bleImageAd4;
+    private ImageView bleImageAd5;
+
     HashMap<String,Object[]> cartHashMap = new HashMap<>();
 
-//  Cart items
-    ListView listView;
-    ArrayList<Product> itemProductList;
-    CustomAdapter customAdapter;
-    Cart cart;
+////  Cart items
+//    ListView listView;
+//    ArrayList<Product> itemProductList;
+//    CustomAdapter customAdapter;
+//    Cart cart;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Find your views
+        ImageButton bleImageButton1 = (ImageButton) findViewById(R.id.bleImageAd1);
+
+        //Assign a listener to your button
+        bleImageButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Start your second activity
+                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//      Cart Elements
-        TextView tvTotal = (TextView) findViewById(R.id.total);
-        listView = (ListView) findViewById(R.id.listview);
-        itemProductList = new ArrayList<>();
-        customAdapter = new CustomAdapter(getApplicationContext(), itemProductList, tvTotal);
-        listView.setEmptyView(findViewById(android.R.id.empty));
-        listView.setAdapter(customAdapter);
-        cart = new Cart(customAdapter,itemProductList,tvTotal);
+////      Cart Elements
+//        TextView tvTotal = (TextView) findViewById(R.id.total);
+//        listView = (ListView) findViewById(R.id.listview);
+//        itemProductList = new ArrayList<>();
+//        customAdapter = new CustomAdapter(getApplicationContext(), itemProductList, tvTotal);
+//        listView.setEmptyView(findViewById(android.R.id.empty));
+//        listView.setAdapter(customAdapter);
+//        cart = new Cart(customAdapter,itemProductList,tvTotal);
 
 //      Permissions for Bluetooth, Location and Camera
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -89,13 +118,13 @@ public class MainActivity extends AppCompatActivity {
             } else { initMsco(); }
         } else { initMsco(); }
 
-        if(savedInstanceState != null){
-            Barcode restoredBarcode = savedInstanceState.getParcelable(BARCODE_KEY);
-            if(restoredBarcode != null){
-//                tvBarcode.setText(restoredBarcode.rawValue);
-                barcodeResult = restoredBarcode;
-            }
-        }
+//        if(savedInstanceState != null){
+//            Barcode restoredBarcode = savedInstanceState.getParcelable(BARCODE_KEY);
+//            if(restoredBarcode != null){
+////                tvBarcode.setText(restoredBarcode.rawValue);
+//                barcodeResult = restoredBarcode;
+//            }
+//        }
     }
 
     @Override
@@ -121,9 +150,7 @@ public class MainActivity extends AppCompatActivity {
 //  TODO: User need to give all the permissions to run the app. Instead it should be based on the permission user gave.
 //  Initializes Bluetooth in background and Barcode scanner button
     private void initMsco(){
-        /**
-         * Bluetooth LE
-         */
+//      Bluetooth LE
         btManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         btAdapter = btManager.getAdapter();
         if (!btAdapter.isEnabled()) {
@@ -132,51 +159,49 @@ public class MainActivity extends AppCompatActivity {
         }
         scanHandler.post(scanRunnable);
 
-        /**
-         * Barcode Scanner
-         */
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        assertNotNull(fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startScan();
-            }
-        });
+////      Barcode Scanner
+//        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        assertNotNull(fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                startScan();
+//            }
+//        });
     }
 
-    private void startScan() {
-        /**
-         * Build a new MaterialBarcodeScanner
-         */
-        final MaterialBarcodeScanner materialBarcodeScanner = new MaterialBarcodeScannerBuilder()
-                .withActivity(MainActivity.this)
-                .withEnableAutoFocus(true)
-                .withBleepEnabled(true)
-                .withBackfacingCamera()
-                .withCenterTracker()
-                .withText("Scanning...")
-                .withResultListener(new MaterialBarcodeScanner.OnResultListener() {
-                    @Override
-                    public void onResult(Barcode barcode) {
-                        barcodeResult = barcode;
-//                        TODO: find the different types of codes to scan. 5 is just assumed number.
-                        if (barcodeResult.rawValue.length() > 5) {
-//                            result.setText(barcode.rawValue);
-                            getBarcodeDetails(barcodeResult.rawValue);
-                        }
-                        else Toast.makeText(MainActivity.this, "Invalid Scan! Please place the barcode parallel to camera.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .build();
-        materialBarcodeScanner.startScan();
-    }
+//    private void startScan() {
+//        /**
+//         * Build a new MaterialBarcodeScanner
+//         */
+//        final MaterialBarcodeScanner materialBarcodeScanner = new MaterialBarcodeScannerBuilder()
+//                .withActivity(MainActivity.this)
+//                .withEnableAutoFocus(true)
+//                .withBleepEnabled(true)
+//                .withBackfacingCamera()
+//                .withCenterTracker()
+//                .withText("Scanning...")
+//                .withResultListener(new MaterialBarcodeScanner.OnResultListener() {
+//                    @Override
+//                    public void onResult(Barcode barcode) {
+//                        barcodeResult = barcode;
+////                        TODO: find the different types of codes to scan. 5 is just assumed number.
+//                        if (barcodeResult.rawValue.length() > 5) {
+////                            result.setText(barcode.rawValue);
+//                            getBarcodeDetails(barcodeResult.rawValue);
+//                        }
+//                        else Toast.makeText(MainActivity.this, "Invalid Scan! Please place the barcode parallel to camera.", Toast.LENGTH_SHORT).show();
+//                    }
+//                })
+//                .build();
+//        materialBarcodeScanner.startScan();
+//    }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(BARCODE_KEY, barcodeResult);
-        super.onSaveInstanceState(outState);
-    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        outState.putParcelable(BARCODE_KEY, barcodeResult);
+//        super.onSaveInstanceState(outState);
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -219,41 +244,41 @@ public class MainActivity extends AppCompatActivity {
         } else { initMsco(); }
     }
 
-    /**
-     * Retrofit API and cart functionality
-     */
-    void getBarcodeDetails(String barcodeRaw) {
-        final String resBarcode = barcodeRaw;
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestApi service = retrofit.create(RestApi.class);
-        Call<Product> call = service.getProductDetails(resBarcode);
-
-        call.enqueue(new Callback<Product>() {
-            @Override
-            public void onResponse(Call<Product> call, Response<Product> response) {
-                try {
-                    String resPrice = response.body().getPrice();
-                    String resTitle = response.body().getTitle();
-                    String resDescription = response.body().getBody();
-
-                    Log.d("POST SCAN API: ","Price:" + resPrice + " Title: " + resTitle + " Description: " + resDescription);
-
-                    Product scannedProduct = new Product(resBarcode,resPrice,resTitle,resDescription);
-                    cart.addProduct(scannedProduct);
-
-                } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "Item Not Found! Contact Sales Team.", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-            }
-            @Override
-            public void onFailure(Call<Product> call, Throwable t) {}
-        });
-    }
+//    /**
+//     * Retrofit API and cart functionality
+//     */
+//    void getBarcodeDetails(String barcodeRaw) {
+//        final String resBarcode = barcodeRaw;
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl(BASE_URL)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//
+//        RestApi service = retrofit.create(RestApi.class);
+//        Call<Product> call = service.getProductDetails(resBarcode);
+//
+//        call.enqueue(new Callback<Product>() {
+//            @Override
+//            public void onResponse(Call<Product> call, Response<Product> response) {
+//                try {
+//                    String resPrice = response.body().getPrice();
+//                    String resTitle = response.body().getTitle();
+//                    String resDescription = response.body().getBody();
+//
+//                    Log.d("POST SCAN API: ","Price:" + resPrice + " Title: " + resTitle + " Description: " + resDescription);
+//
+//                    Product scannedProduct = new Product(resBarcode,resPrice,resTitle,resDescription);
+//                    cart.addProduct(scannedProduct);
+//
+//                } catch (Exception e) {
+//                    Toast.makeText(MainActivity.this, "Item Not Found! Contact Sales Team.", Toast.LENGTH_SHORT).show();
+//                    e.printStackTrace();
+//                }
+//            }
+//            @Override
+//            public void onFailure(Call<Product> call, Throwable t) {}
+//        });
+//    }
 
     /**
      * Retrofit API and BLE functionality
@@ -278,6 +303,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("POST BEACON API: ","UUID:" + resBeaconUuid + " Message: " + resBeaconMessage);
 
                     Beacon beacon = new Beacon(resBeaconUuid,resBeaconMessage,resBeaconLocation);
+
                     TextView bleAd = (TextView) findViewById(R.id.bleAd);
 
                     bleAd.setVisibility(View.VISIBLE);
@@ -290,7 +316,44 @@ public class MainActivity extends AppCompatActivity {
                         offersMessage = "Hey " + name + ", Welcome to " + beacon.getLocation() + "\n Check out our new Offers!";
                     }
 
+//                  Initializing the ImageView
+                    bleImageAd1 = (ImageView) findViewById(R.id.bleImageAd1);
+                    bleImageAd2 = (ImageView) findViewById(R.id.bleImageAd2);
+                    bleImageAd3 = (ImageView) findViewById(R.id.bleImageAd3);
+                    bleImageAd4 = (ImageView) findViewById(R.id.bleImageAd4);
+                    bleImageAd5 = (ImageView) findViewById(R.id.bleImageAd5);
+
+//                  Loading Image from URL
+                    Picasso.with(MainActivity.this)
+                            .load("http://www.samplesalesites.com/wp-content/uploads/2010/10/vintage_chanel.jpg")
+                            .into(bleImageAd1);
+
+                    Picasso.with(MainActivity.this)
+                            .load("https://shopunder.com/blog/wp-content/uploads/2017/08/Prada-Sale.jpg")
+                            .into(bleImageAd2);
+
+                    Picasso.with(MainActivity.this)
+                            .load("https://www.filepicker.io/api/file/QOvnEnZDSy2dwF2MHDGg/convert?quality=60&crop=0,0,0,0")
+                            .into(bleImageAd3);
+
+                    Picasso.with(MainActivity.this)
+                            .load("https://smartcanucks.ca/wp-content/uploads/2014/06/lacoste-sale.jpg")
+                            .into(bleImageAd4);
+
+                    Picasso.with(MainActivity.this)
+                            .load("http://eastgateshopping.co.uk/assets/images/Shops/h-m.jpg")
+                            .into(bleImageAd5);
+
+//                  https://shopunder.com/blog/wp-content/uploads/2017/08/Prada-Sale.jpg
+//                  https://www.filepicker.io/api/file/QOvnEnZDSy2dwF2MHDGg/convert?quality=60&crop=0,0,0,0
+//                  https://www.shefinds.com/files/2011/05/portero-louis-vuitton-sale.jpg
+//                  https://smartcanucks.ca/wp-content/uploads/2014/06/lacoste-sale.jpg
+//                  https://www.shefinds.com/files/2011/05/portero-louis-vuitton-sale.jpg
+//                  http://eastgateshopping.co.uk/assets/images/Shops/h-m.jpg
+
                     bleAd.setText( offersMessage );
+
+
 
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "Item Not Found! Contact Sales Team.", Toast.LENGTH_SHORT).show();
@@ -338,7 +401,13 @@ public class MainActivity extends AppCompatActivity {
                 final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
                 Log.i(LOG_TAG, "UUID: " + uuid + "\\nmajor: " + major + "\\nminor" + minor);
-                getCustomerDetails(uuid);
+
+                TextView bleAd = (TextView) findViewById(R.id.bleAd);
+                if(TextUtils.isEmpty(bleAd.getText())){
+                    Log.i(LOG_TAG, "API Request");
+                    getCustomerDetails(uuid);
+                }
+
             }
         }
     };
