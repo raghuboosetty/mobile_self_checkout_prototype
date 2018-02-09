@@ -278,7 +278,7 @@ public class ScanActivity extends AppCompatActivity {
                         Beacon beacon = new Beacon(resBeaconUuid, resBeaconMessage, resBeaconLocation, resBeaconOffers);
 
 //                      TODO: remove hardcoded logic
-                        if(resBeaconLocation != "CCC") {
+                        if (!resBeaconLocation.equals("CCC")) {
                             TextView bleAdShop = (TextView) findViewById(R.id.bleAdShop);
                             bleAdShop.setVisibility(View.VISIBLE);
                             bleAdShop.setText(resBeaconMessage);
