@@ -1,6 +1,7 @@
 package com.reonios.mscoprototype;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -47,6 +48,15 @@ public class ScanActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String store = extras.getString("store");
+            android.support.v7.app.ActionBar storeAb = getSupportActionBar();
+            storeAb.setTitle(store);
+            storeAb.setSubtitle(getString(R.string.title_activity_scan));
+            //The key argument here must match that used in the other activity
+        }
 
 
 //      Cart Elements
