@@ -49,11 +49,14 @@ public class MainActivity extends AppCompatActivity {
     //  Restro fit API
     public static final String BASE_URL = "https://msco.herokuapp.com/api/";
 
-    //  Bluetooth LE Scanner
+//  Bluetooth LE Scanner
     private BluetoothManager btManager;
     private BluetoothAdapter btAdapter;
+    private ArrayList<String> bleUuidArrayList = new ArrayList<>();
+    private BleScan bleScan;
+
     private Handler scanHandler = new Handler();
-    private int scan_interval_ms = 5000;
+    private int scan_interval_ms = 3000;
     private boolean isScanning = false;
     static final char[] hexArray = "0123456789ABCDEF".toCharArray();
     private static final String LOG_TAG = "MainActivity";
@@ -119,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
             btAdapter.enable();
             Toast.makeText(MainActivity.this, "Bluetooth Enabled", Toast.LENGTH_LONG).show();
         }
+
+        bleScan = new BleScan(this, btAdapter, bleUuidArrayList);
+//        bleScan.startBleScan();
         scanHandler.post(scanRunnable);
 
     }
@@ -190,107 +196,130 @@ public class MainActivity extends AppCompatActivity {
 
                         Beacon beacon = new Beacon(resBeaconUuid, resBeaconMessage, resBeaconLocation, resBeaconOffers);
 
-                        TextView bleAd = (TextView) findViewById(R.id.bleAd);
+//                      TODO: remove hardcoded logic
+                        if (resBeaconLocation.equals("CCC")) {
 
-                        bleAd.setVisibility(View.VISIBLE);
+                            TextView bleAd = (TextView) findViewById(R.id.bleAd);
+                            bleAd.setVisibility(View.VISIBLE);
 
-                        final SharedPreferences mSharedPreference = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                        String name = (mSharedPreference.getString("example_text", "Your Name"));
+//                      Get user details(name)
+                            final SharedPreferences mSharedPreference = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                            String name = (mSharedPreference.getString("example_text", "Your Name"));
 
-                        String offersMessage = "Hey " + ", Welcome to " + beacon.getLocation() + "\n Check out our new Offers!";
-                        if (name != "Your Name") {
-                            offersMessage = "Hey " + name + ", Welcome to " + beacon.getLocation() + "\n Check out our new Offers!";
-                        }
+                            String offersMessage = "Hey There," + ", Welcome to " + beacon.getLocation() + "\n Check out our new Offers!";
+
+                            if (name != "Your Name") {
+                                offersMessage = "Hey " + name + ", Welcome to " + beacon.getLocation() + "\n Check out our new Offers!";
+                            }
 
 //                  Initializing the ImageView
-                        bleImageAd1 = (ImageButton) findViewById(R.id.bleImageAd1);
-                        bleImageAd2 = (ImageButton) findViewById(R.id.bleImageAd2);
-                        bleImageAd3 = (ImageButton) findViewById(R.id.bleImageAd3);
-                        bleImageAd4 = (ImageButton) findViewById(R.id.bleImageAd4);
-                        bleImageAd5 = (ImageButton) findViewById(R.id.bleImageAd5);
+                            bleImageAd1 = (ImageButton) findViewById(R.id.bleImageAd1);
+                            bleImageAd2 = (ImageButton) findViewById(R.id.bleImageAd2);
+                            bleImageAd3 = (ImageButton) findViewById(R.id.bleImageAd3);
+                            bleImageAd4 = (ImageButton) findViewById(R.id.bleImageAd4);
+                            bleImageAd5 = (ImageButton) findViewById(R.id.bleImageAd5);
 
 //                  Loading Image from URL
-                        Picasso.with(MainActivity.this)
-                                .load(resBeaconOffers.get(0).getImageUrl())
-                                .into(bleImageAd1);
+                            Picasso.with(MainActivity.this)
+                                    .load(resBeaconOffers.get(0).getImageUrl())
+                                    .into(bleImageAd1);
 
-                        Picasso.with(MainActivity.this)
-                                .load(resBeaconOffers.get(1).getImageUrl())
-                                .into(bleImageAd2);
+                            Picasso.with(MainActivity.this)
+                                    .load(resBeaconOffers.get(1).getImageUrl())
+                                    .into(bleImageAd2);
 
-                        Picasso.with(MainActivity.this)
-                                .load(resBeaconOffers.get(2).getImageUrl())
-                                .into(bleImageAd3);
+                            Picasso.with(MainActivity.this)
+                                    .load(resBeaconOffers.get(2).getImageUrl())
+                                    .into(bleImageAd3);
 
-                        Picasso.with(MainActivity.this)
-                                .load(resBeaconOffers.get(3).getImageUrl())
-                                .into(bleImageAd4);
+                            Picasso.with(MainActivity.this)
+                                    .load(resBeaconOffers.get(3).getImageUrl())
+                                    .into(bleImageAd4);
 
-                        Picasso.with(MainActivity.this)
-                                .load(resBeaconOffers.get(4).getImageUrl())
-                                .into(bleImageAd5);
+                            Picasso.with(MainActivity.this)
+                                    .load(resBeaconOffers.get(4).getImageUrl())
+                                    .into(bleImageAd5);
 
-                        bleAd.setText(offersMessage);
+                            bleAd.setText(offersMessage);
 
+                            //Assign a listener to your button
+                            bleImageAd1.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //Start your second activity
+                                    Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putString("storeName", resBeaconOffers.get(0).getStoreName());
+                                    extras.putString("imageUrl", resBeaconOffers.get(0).getImageUrl());
+                                    scanIntent.putExtras(extras);
+                                    startActivity(scanIntent);
+                                }
+                            });
 
-                        //Assign a listener to your button
-                        bleImageAd1.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //Start your second activity
-                                Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
-                                scanIntent.putExtra("store", resBeaconOffers.get(0).getStoreName());
-                                startActivity(scanIntent);
-                            }
-                        });
+                            //Assign a listener to your button
+                            bleImageAd2.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //Start your second activity
+                                    Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putString("storeName", resBeaconOffers.get(1).getStoreName());
+                                    extras.putString("imageUrl", resBeaconOffers.get(1).getImageUrl());
+                                    scanIntent.putExtras(extras);
+                                    startActivity(scanIntent);
+                                }
+                            });
 
-                        //Assign a listener to your button
-                        bleImageAd2.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //Start your second activity
-                                Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
-                                scanIntent.putExtra("store", resBeaconOffers.get(1).getStoreName());
-                                startActivity(scanIntent);
-                            }
-                        });
+                            //Assign a listener to your button
+                            bleImageAd3.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //Start your second activity
+                                    Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putString("storeName", resBeaconOffers.get(2).getStoreName());
+                                    extras.putString("imageUrl", resBeaconOffers.get(2).getImageUrl());
+                                    scanIntent.putExtras(extras);
+                                    startActivity(scanIntent);
+                                }
+                            });
 
-                        //Assign a listener to your button
-                        bleImageAd3.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //Start your second activity
-                                Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
-                                scanIntent.putExtra("store", resBeaconOffers.get(2).getStoreName());
-                                startActivity(scanIntent);
-                            }
-                        });
+                            //Assign a listener to your button
+                            bleImageAd4.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //Start your second activity
+                                    Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putString("storeName", resBeaconOffers.get(3).getStoreName());
+                                    extras.putString("imageUrl", resBeaconOffers.get(3).getImageUrl());
+                                    scanIntent.putExtras(extras);
+                                    startActivity(scanIntent);
+                                }
+                            });
 
-                        //Assign a listener to your button
-                        bleImageAd4.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //Start your second activity
-                                Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
-                                scanIntent.putExtra("store", resBeaconOffers.get(3).getStoreName());
-                                startActivity(scanIntent);
-                            }
-                        });
-
-                        //Assign a listener to your button
-                        bleImageAd5.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //Start your second activity
-                                Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
-                                scanIntent.putExtra("store", resBeaconOffers.get(4).getStoreName());
-                                startActivity(scanIntent);
-                            }
-                        });
+                            //Assign a listener to your button
+                            bleImageAd5.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //Start your second activity
+                                    Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putString("storeName", resBeaconOffers.get(4).getStoreName());
+                                    extras.putString("imageUrl", resBeaconOffers.get(4).getImageUrl());
+                                    scanIntent.putExtras(extras);
+                                    startActivity(scanIntent);
+                                }
+                            });
+                        }
+                        else{
+//                            TextView bleAdShop = (TextView) findViewById(R.id.bleAdShop);
+//                            bleAdShop.setText(resBeaconMessage);
+                        }
                     }
 
                 } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "Item Not Found! Contact Sales Team.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Beacon Not Found! Please Contact Support Team.", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
@@ -299,81 +328,108 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Bluetooth LE Scanner
-     */
-    private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
-        @Override
-        public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-            int startByte = 2;
-            boolean patternFound = false;
-            while (startByte <= 5) {
-                if (((int) scanRecord[startByte + 2] & 0xff) == 0x02 && //Identifies an iBeacon
-                        ((int) scanRecord[startByte + 3] & 0xff) == 0x15) { //Identifies correct data length
-                    patternFound = true;
-                    break;
-                }
-                startByte++;
-            }
+////  Bluetooth LE Scanner
+//    private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
+//        @Override
+//        public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
+//            int startByte = 2;
+//            boolean patternFound = false;
+//            while (startByte <= 5) {
+//                if (((int) scanRecord[startByte + 2] & 0xff) == 0x02 && //Identifies an iBeacon
+//                        ((int) scanRecord[startByte + 3] & 0xff) == 0x15) { //Identifies correct data length
+//                    patternFound = true;
+//                    break;
+//                }
+//                startByte++;
+//            }
+//
+//            if (patternFound) {
+//                Log.i(LOG_TAG, "DEVICE: " + device+ "\\RSSI: " + rssi + "\\SCANRECORD" + scanRecord + " \\DISTANCE:" + calculateBeaconDistance(-59, rssi));
+//
+//                //Convert to hex String
+//                byte[] uuidBytes = new byte[16];
+//                System.arraycopy(scanRecord, startByte + 4, uuidBytes, 0, 16);
+//                String hexString = bytesToHex(uuidBytes);
+//
+//                //UUID detection
+//                String uuid = hexString.substring(0, 8) + "-" +
+//                        hexString.substring(8, 12) + "-" +
+//                        hexString.substring(12, 16) + "-" +
+//                        hexString.substring(16, 20) + "-" +
+//                        hexString.substring(20, 32);
+//
+//                // major
+//                final int major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
+//                // minor
+//                final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
+//
+//                Log.i(LOG_TAG, "UUID: " + uuid + "\\nmajor: " + major + "\\nminor" + minor);
+//
+//                TextView bleAd = (TextView) findViewById(R.id.bleAd);
+//                if(TextUtils.isEmpty(bleAd.getText())){
+//                    getCustomerDetails(uuid);
+//                }
+//
+//            }
+//        }
+//    };
 
-            if (patternFound) {
-                Log.i(LOG_TAG, "DEVICE: " + device+ "\\RSSI: " + rssi + "\\SCANRECORD" + scanRecord + " \\DISTANCE:" + calculateBeaconDistance(-59, rssi));
+//    private Runnable scanRunnable = new Runnable() {
+//        @Override
+//        public void run() {
+//            if (isScanning) {
+//                if (btAdapter != null) {
+//                    btAdapter.stopLeScan(leScanCallback);
+//                }
+//            } else {
+//                if (btAdapter != null) {
+//                    btAdapter.startLeScan(leScanCallback);
+//                }
+//            }
+//            isScanning = !isScanning;
+//            scanHandler.postDelayed(this, scan_interval_ms);
+//        }
+//    };
 
-                //Convert to hex String
-                byte[] uuidBytes = new byte[16];
-                System.arraycopy(scanRecord, startByte + 4, uuidBytes, 0, 16);
-                String hexString = bytesToHex(uuidBytes);
 
-                //UUID detection
-                String uuid = hexString.substring(0, 8) + "-" +
-                        hexString.substring(8, 12) + "-" +
-                        hexString.substring(12, 16) + "-" +
-                        hexString.substring(16, 20) + "-" +
-                        hexString.substring(20, 32);
-
-                // major
-                final int major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
-                // minor
-                final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
-
-                Log.i(LOG_TAG, "UUID: " + uuid + "\\nmajor: " + major + "\\nminor" + minor);
-
-                TextView bleAd = (TextView) findViewById(R.id.bleAd);
-                if(TextUtils.isEmpty(bleAd.getText())){
-                    Log.i(LOG_TAG, "API Request");
-                    getCustomerDetails(uuid);
-                }
-
-            }
-        }
-    };
-
-    private Runnable scanRunnable = new Runnable() {
+        private Runnable scanRunnable = new Runnable() {
         @Override
         public void run() {
             if (isScanning) {
                 if (btAdapter != null) {
-                    btAdapter.stopLeScan(leScanCallback);
+                    bleScan.startBleScan();
                 }
             } else {
                 if (btAdapter != null) {
-                    btAdapter.startLeScan(leScanCallback);
+                    bleScan.stopBleScan();
                 }
             }
             isScanning = !isScanning;
-            scanHandler.postDelayed(this, scan_interval_ms);
+
+            for (int i = 0; i < bleUuidArrayList.size(); i++) {
+                getCustomerDetails(bleUuidArrayList.get(i));
+            }
+
+            TextView bleAd = (TextView) findViewById(R.id.bleAd);
+            if (TextUtils.isEmpty(bleAd.getText())) {
+                scanHandler.postDelayed(this, scan_interval_ms);
+            }
+            else {
+                bleScan.stopBleScan();
+            }
         }
     };
 
-    private static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
+
+//    private static String bytesToHex(byte[] bytes) {
+//        char[] hexChars = new char[bytes.length * 2];
+//        for (int j = 0; j < bytes.length; j++) {
+//            int v = bytes[j] & 0xFF;
+//            hexChars[j * 2] = hexArray[v >>> 4];
+//            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+//        }
+//        return new String(hexChars);
+//    }
 
     protected double calculateBeaconDistance(float txPower, double rssi) {
 

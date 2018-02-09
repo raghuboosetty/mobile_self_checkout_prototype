@@ -2,16 +2,24 @@ package com.reonios.mscoprototype;
 
 import android.Manifest;
 import android.app.ActionBar;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +27,7 @@ import android.widget.Toast;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.reonios.msco.MaterialBarcodeScanner;
 import com.reonios.msco.MaterialBarcodeScannerBuilder;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -31,6 +40,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static junit.framework.Assert.assertNotNull;
 
 public class ScanActivity extends AppCompatActivity {
+    private BluetoothManager btManager;
+    private BluetoothAdapter btAdapter;
+    private ArrayList<String> bleUuidArrayList = new ArrayList<>();
+    private BleScan bleScan;
+    private boolean isScanning = false;
+    private int scan_interval_ms = 3000;
+    private Handler scanHandler = new Handler();
+
+    private static final String LOG_TAG = "ScanActivity";
+
 //  Restro fit API
     public static final String BASE_URL = "https://msco.herokuapp.com/api/";
     public static final String BARCODE_KEY = "BARCODE";
@@ -51,11 +70,28 @@ public class ScanActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String store = extras.getString("store");
+            String storeName = extras.getString("storeName");
             android.support.v7.app.ActionBar storeAb = getSupportActionBar();
-            storeAb.setTitle(store);
+            storeAb.setTitle(storeName);
             storeAb.setSubtitle(getString(R.string.title_activity_scan));
-            //The key argument here must match that used in the other activity
+
+            ImageView bleImageAdShop = (ImageView) findViewById(R.id.bleImageAdShop);
+            String imageUrl = extras.getString("imageUrl");
+            Picasso.with(ScanActivity.this)
+                    .load(imageUrl)
+                    .into(bleImageAdShop);
+
+            //      Bluetooth LE
+            btManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+            btAdapter = btManager.getAdapter();
+            if (!btAdapter.isEnabled()) {
+                btAdapter.enable();
+                Toast.makeText(ScanActivity.this, "Bluetooth Enabled", Toast.LENGTH_LONG).show();
+            }
+            bleScan = new BleScan(this, btAdapter, bleUuidArrayList);
+//        bleScan.startBleScan();
+            scanHandler.post(scanRunnable);
+
         }
 
 
@@ -185,6 +221,77 @@ public class ScanActivity extends AppCompatActivity {
             }
             @Override
             public void onFailure(Call<Product> call, Throwable t) {}
+        });
+    }
+
+    private Runnable scanRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isScanning) {
+                if (btAdapter != null) {
+                    bleScan.startBleScan();
+                }
+            } else {
+                if (btAdapter != null) {
+                    bleScan.stopBleScan();
+                }
+            }
+            isScanning = !isScanning;
+
+//            Log.d(LOG_TAG, "ARRAY LIST" + bleUuidArrayList);
+            for (int i = 0; i < bleUuidArrayList.size(); i++) {
+                getCustomerDetails(bleUuidArrayList.get(i));
+            }
+
+            TextView bleAdShop = (TextView) findViewById(R.id.bleAdShop);
+            if (TextUtils.isEmpty(bleAdShop.getText())) {
+//                Log.d(LOG_TAG, "BLE AD SHOP IS EMPTY");
+                scanHandler.postDelayed(this, scan_interval_ms);
+            } else {
+//                Log.d(LOG_TAG, "SCAN STOPPED");
+                bleScan.stopBleScan();
+            }
+        }
+    };
+
+    void getCustomerDetails(String beaconUuidRaw) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestApi service = retrofit.create(RestApi.class);
+        Call<Beacon> call = service.getBeaconDetails(beaconUuidRaw);
+
+        call.enqueue(new Callback<Beacon>() {
+            @Override
+            public void onResponse(Call<Beacon> call, Response<Beacon> response) {
+                try {
+                    if (response.body() != null) {
+                        String resBeaconUuid = response.body().getUuid();
+                        String resBeaconMessage = response.body().getMessage();
+                        String resBeaconLocation = response.body().getLocation();
+                        final ArrayList<Offer> resBeaconOffers = response.body().getOffers();
+
+                        Log.d("POST BEACON API: ", "UUID:" + resBeaconUuid + " Message: " + resBeaconMessage + " Offers: " + resBeaconOffers.get(0).getImageUrl() + " STORE NAME: " + resBeaconOffers.get(0).getStoreName());
+
+                        Beacon beacon = new Beacon(resBeaconUuid, resBeaconMessage, resBeaconLocation, resBeaconOffers);
+
+//                      TODO: remove hardcoded logic
+                        if(resBeaconLocation != "CCC") {
+                            TextView bleAdShop = (TextView) findViewById(R.id.bleAdShop);
+                            bleAdShop.setVisibility(View.VISIBLE);
+                            bleAdShop.setText(resBeaconMessage);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(ScanActivity.this, "Beacon Not Found! Please Contact Support Team.", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onFailure(Call<Beacon> call, Throwable t) {}
         });
     }
 }
