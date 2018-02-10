@@ -85,6 +85,9 @@ public class ScanActivity extends AppCompatActivity {
 
             TextView bleAdShop = (TextView) findViewById(R.id.bleAdShop);
             bleAdShop.setVisibility(View.VISIBLE);
+            if ((userName.equals("Your Name")) || (userName.equals("John Smith"))) {
+                userName = "";
+            }
             bleAdShop.setText(getString(R.string.ble_ad_shop_part_1) + " " + userName + " " + getString(R.string.ble_ad_shop_part_2) + " " + storeName + getString(R.string.ble_ad_shop_part_3));
 
             ImageView bleImageAdShop = (ImageView) findViewById(R.id.bleImageAdShop);

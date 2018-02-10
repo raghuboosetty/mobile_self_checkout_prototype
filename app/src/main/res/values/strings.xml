@@ -21,7 +21,7 @@
     </string>
 
     <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
+    <string name="pref_default_display_name">Your Name</string>
 
     <string name="pref_title_phone">Phone</string>
     <string name="pref_default_phone">0987654321</string>
