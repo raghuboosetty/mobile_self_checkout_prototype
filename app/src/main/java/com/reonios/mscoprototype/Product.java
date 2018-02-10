@@ -82,4 +82,5 @@ public class Product {
     public void setQuantityPrice(Double quantityPrice) {
         this.quantityPrice = quantityPrice;
     }
+
 }

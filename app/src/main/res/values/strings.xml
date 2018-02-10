@@ -5,7 +5,10 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_scan">Scan and Shop</string>
-
+    <string name="ble_ad">Your CCC app is techno enabled to be personalized to you!</string>
+    <string name="ble_ad_shop_part_1">Thank you</string>
+    <string name="ble_ad_shop_part_2"> for your interest in our offer at</string>
+    <string name="ble_ad_shop_part_3">. Do walk into our store and pick your items and pay through your CCC APP!</string>
 
     <!-- Strings related to Settings -->
 

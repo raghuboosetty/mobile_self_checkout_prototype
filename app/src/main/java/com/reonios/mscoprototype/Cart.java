@@ -1,6 +1,9 @@
 package com.reonios.mscoprototype;
 
 import android.widget.TextView;
+
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -86,5 +89,13 @@ public class Cart {
         itemProductList.removeAll(itemProductList);
         customAdapter.notifyDataSetChanged();
         tvTotal.setText(totalCartValue.toString());
+    }
+
+    @Override
+    public String toString() {
+//        for (int i = 0; i < itemProductList.size(); i++) {
+
+        JSONArray jsArray = new JSONArray(itemProductList);
+        return jsArray.toString();
     }
 }

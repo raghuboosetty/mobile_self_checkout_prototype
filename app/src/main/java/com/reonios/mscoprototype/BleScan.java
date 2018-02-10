@@ -79,7 +79,7 @@ public class BleScan {
                 // minor
                 final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
-                Log.i(LOG_TAG, "UUID: " + uuid + "\\nmajor: " + major + "\\nminor" + minor);
+//                Log.i(LOG_TAG, "UUID: " + uuid + "\\nmajor: " + major + "\\nminor" + minor);
 
 //                TextView bleAd = (TextView) activity.findViewById(R.id.bleAd);
 //                if (TextUtils.isEmpty(bleAd.getText()) && !bleUuidArrayList.contains(uuid)) {

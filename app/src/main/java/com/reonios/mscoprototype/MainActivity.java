@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,7 +48,7 @@ import static junit.framework.Assert.assertNotNull;
 
 public class MainActivity extends AppCompatActivity {
     //  Restro fit API
-    public static final String BASE_URL = "https://msco.herokuapp.com/api/";
+    public static final String BASE_URL = "https://msco.herokuapp.com/";
 
     //  Bluetooth LE Scanner
     private BluetoothManager btManager;
@@ -70,6 +71,24 @@ public class MainActivity extends AppCompatActivity {
     private ImageView bleImageAd3;
     private ImageView bleImageAd4;
     private ImageView bleImageAd5;
+
+    private TextView bleTextAd1;
+    private TextView bleTextAd2;
+    private TextView bleTextAd3;
+    private TextView bleTextAd4;
+    private TextView bleTextAd5;
+
+    private TextView bleSubTextAd1;
+    private TextView bleSubTextAd2;
+    private TextView bleSubTextAd3;
+    private TextView bleSubTextAd4;
+    private TextView bleSubTextAd5;
+
+    private LinearLayout bleAd1;
+    private LinearLayout bleAd2;
+    private LinearLayout bleAd3;
+    private LinearLayout bleAd4;
+    private LinearLayout bleAd5;
 
     HashMap<String,Object[]> cartHashMap = new HashMap<>();
 
@@ -105,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             // launch settings activity
             startActivity(new Intent(this, SettingsActivity.class));
+//            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             return true;
         }
 
@@ -192,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                         String resBeaconLocation = response.body().getLocation();
                         final ArrayList<Offer> resBeaconOffers = response.body().getOffers();
 
-                        Log.d("POST BEACON API: ", "UUID:" + resBeaconUuid + " Message: " + resBeaconMessage + " Offers: " + resBeaconOffers.get(0).getImageUrl() + " STORE NAME: " + resBeaconOffers.get(0).getStoreName());
+//                        Log.d("POST BEACON API: ", "UUID:" + resBeaconUuid + " Message: " + resBeaconMessage + " Offers: " + resBeaconOffers.get(0).getImageUrl() + " STORE NAME: " + resBeaconOffers.get(0).getStoreName());
 
                         Beacon beacon = new Beacon(resBeaconUuid, resBeaconMessage, resBeaconLocation, resBeaconOffers);
 
@@ -208,9 +228,44 @@ public class MainActivity extends AppCompatActivity {
 
                             String offersMessage = "Hey There," + " Welcome to " + beacon.getLocation() + "\n Check out our new Offers!";
 
-                            if (name != "Your Name") {
+                            if (!(name.equals("Your Name")) && !(name.equals("John Smith")) && !(name.equals(""))) {
                                 offersMessage = "Hey " + name + ", Welcome to " + beacon.getLocation() + "\n Check out our new Offers!";
                             }
+
+                            bleAd1 = (LinearLayout) findViewById(R.id.bleAd1);
+                            bleAd1.setVisibility(View.VISIBLE);
+                            bleAd2 = (LinearLayout) findViewById(R.id.bleAd2);
+                            bleAd2.setVisibility(View.VISIBLE);
+                            bleAd3 = (LinearLayout) findViewById(R.id.bleAd3);
+                            bleAd3.setVisibility(View.VISIBLE);
+                            bleAd4 = (LinearLayout) findViewById(R.id.bleAd4);
+                            bleAd4.setVisibility(View.VISIBLE);
+                            bleAd5 = (LinearLayout) findViewById(R.id.bleAd5);
+                            bleAd5.setVisibility(View.VISIBLE);
+
+                            bleTextAd1 = (TextView) findViewById(R.id.bleTextAd1);
+                            bleTextAd2 = (TextView) findViewById(R.id.bleTextAd2);
+                            bleTextAd3 = (TextView) findViewById(R.id.bleTextAd3);
+                            bleTextAd4 = (TextView) findViewById(R.id.bleTextAd4);
+                            bleTextAd5 = (TextView) findViewById(R.id.bleTextAd5);
+
+                            bleTextAd1.setText(resBeaconOffers.get(0).getStoreName());
+                            bleTextAd2.setText(resBeaconOffers.get(1).getStoreName());
+                            bleTextAd3.setText(resBeaconOffers.get(2).getStoreName());
+                            bleTextAd4.setText(resBeaconOffers.get(3).getStoreName());
+                            bleTextAd5.setText(resBeaconOffers.get(4).getStoreName());
+
+                            bleSubTextAd1 = (TextView) findViewById(R.id.bleSubTextAd1);
+                            bleSubTextAd2 = (TextView) findViewById(R.id.bleSubTextAd2);
+                            bleSubTextAd3 = (TextView) findViewById(R.id.bleSubTextAd3);
+                            bleSubTextAd4 = (TextView) findViewById(R.id.bleSubTextAd4);
+                            bleSubTextAd5 = (TextView) findViewById(R.id.bleSubTextAd5);
+
+                            bleSubTextAd1.setText(resBeaconOffers.get(0).getOffer());
+                            bleSubTextAd2.setText(resBeaconOffers.get(1).getOffer());
+                            bleSubTextAd3.setText(resBeaconOffers.get(2).getOffer());
+                            bleSubTextAd4.setText(resBeaconOffers.get(3).getOffer());
+                            bleSubTextAd5.setText(resBeaconOffers.get(4).getOffer());
 
 //                  Initializing the ImageView
                             bleImageAd1 = (ImageButton) findViewById(R.id.bleImageAd1);
@@ -253,6 +308,7 @@ public class MainActivity extends AppCompatActivity {
                                     extras.putString("imageUrl", resBeaconOffers.get(0).getImageUrl());
                                     scanIntent.putExtras(extras);
                                     startActivity(scanIntent);
+                                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                 }
                             });
 
@@ -267,6 +323,7 @@ public class MainActivity extends AppCompatActivity {
                                     extras.putString("imageUrl", resBeaconOffers.get(1).getImageUrl());
                                     scanIntent.putExtras(extras);
                                     startActivity(scanIntent);
+                                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                 }
                             });
 
@@ -281,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
                                     extras.putString("imageUrl", resBeaconOffers.get(2).getImageUrl());
                                     scanIntent.putExtras(extras);
                                     startActivity(scanIntent);
+                                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                 }
                             });
 
@@ -295,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
                                     extras.putString("imageUrl", resBeaconOffers.get(3).getImageUrl());
                                     scanIntent.putExtras(extras);
                                     startActivity(scanIntent);
+                                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                 }
                             });
 
@@ -309,6 +368,7 @@ public class MainActivity extends AppCompatActivity {
                                     extras.putString("imageUrl", resBeaconOffers.get(4).getImageUrl());
                                     scanIntent.putExtras(extras);
                                     startActivity(scanIntent);
+                                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                 }
                             });
                         }
@@ -347,7 +407,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             TextView bleAd = (TextView) findViewById(R.id.bleAd);
-            if (TextUtils.isEmpty(bleAd.getText())) {
+//            Log.d(LOG_TAG, bleAd.getText().toString());
+//            TextUtils.isEmpty(bleAd.getText()) ||
+            if (bleAd.getText().toString().equals(getResources().getString(R.string.ble_ad))) {
                 scanHandler.postDelayed(this, scan_interval_ms);
             }
             else {

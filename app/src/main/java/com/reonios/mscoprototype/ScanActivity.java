@@ -27,8 +27,12 @@ import android.widget.Toast;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.reonios.msco.MaterialBarcodeScanner;
 import com.reonios.msco.MaterialBarcodeScannerBuilder;
+import com.squareup.okhttp.ResponseBody;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -40,6 +44,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static junit.framework.Assert.assertNotNull;
 
 public class ScanActivity extends AppCompatActivity {
+
     private BluetoothManager btManager;
     private BluetoothAdapter btAdapter;
     private ArrayList<String> bleUuidArrayList = new ArrayList<>();
@@ -51,7 +56,7 @@ public class ScanActivity extends AppCompatActivity {
     private static final String LOG_TAG = "ScanActivity";
 
 //  Restro fit API
-    public static final String BASE_URL = "https://msco.herokuapp.com/api/";
+    public static final String BASE_URL = "https://msco.herokuapp.com/";
     public static final String BARCODE_KEY = "BARCODE";
     private Barcode barcodeResult;
 
@@ -75,6 +80,13 @@ public class ScanActivity extends AppCompatActivity {
             storeAb.setTitle(storeName);
             storeAb.setSubtitle(getString(R.string.title_activity_scan));
 
+            final SharedPreferences mSharedPreference = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            String userName = (mSharedPreference.getString("example_text", "Your Name"));
+
+            TextView bleAdShop = (TextView) findViewById(R.id.bleAdShop);
+            bleAdShop.setVisibility(View.VISIBLE);
+            bleAdShop.setText(getString(R.string.ble_ad_shop_part_1) + " " + userName + " " + getString(R.string.ble_ad_shop_part_2) + " " + storeName + getString(R.string.ble_ad_shop_part_3));
+
             ImageView bleImageAdShop = (ImageView) findViewById(R.id.bleImageAdShop);
             String imageUrl = extras.getString("imageUrl");
             Picasso.with(ScanActivity.this)
@@ -88,9 +100,13 @@ public class ScanActivity extends AppCompatActivity {
                 btAdapter.enable();
                 Toast.makeText(ScanActivity.this, "Bluetooth Enabled", Toast.LENGTH_LONG).show();
             }
-            bleScan = new BleScan(this, btAdapter, bleUuidArrayList);
-//        bleScan.startBleScan();
-            scanHandler.post(scanRunnable);
+
+//          TODO: remove static assignment
+            if (storeName.equals("H&M")) {
+                bleScan = new BleScan(this, btAdapter, bleUuidArrayList);
+//              bleScan.startBleScan();
+                scanHandler.post(scanRunnable);
+            }
 
         }
 
@@ -127,6 +143,7 @@ public class ScanActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -149,6 +166,24 @@ public class ScanActivity extends AppCompatActivity {
         pay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                Retrofit retrofit = new Retrofit.Builder()
+//                        .baseUrl(BASE_URL)
+//                        .addConverterFactory(GsonConverterFactory.create())
+//                        .build();
+//
+//                RestApi service = retrofit.create(RestApi.class);
+//                ProductList itemProductList = new ProductList(cart.itemProductList);
+//                Call<ResponseBody> call = service.postBeaconDetails("9177167375", itemProductList);
+//                call.enqueue(new Callback<ResponseBody>() {
+//                    @Override
+//                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                        Log.i("POST RESPONSE: ", response.message());
+//                    }
+//                    @Override
+//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                    }
+//                });
+
                 cart.removeProducts();
                 Toast.makeText(ScanActivity.this, "Payment Successful!", Toast.LENGTH_LONG).show();
             }
@@ -209,7 +244,7 @@ public class ScanActivity extends AppCompatActivity {
                     String resTitle = response.body().getTitle();
                     String resDescription = response.body().getBody();
 
-                    Log.d("POST SCAN API: ","Price:" + resPrice + " Title: " + resTitle + " Description: " + resDescription);
+//                    Log.d("POST SCAN API: ","Price:" + resPrice + " Title: " + resTitle + " Description: " + resDescription);
 
                     Product scannedProduct = new Product(resBarcode,resPrice,resTitle,resDescription);
                     cart.addProduct(scannedProduct);
@@ -244,7 +279,8 @@ public class ScanActivity extends AppCompatActivity {
             }
 
             TextView bleAdShop = (TextView) findViewById(R.id.bleAdShop);
-            if (TextUtils.isEmpty(bleAdShop.getText())) {
+//            (TextUtils.isEmpty(bleAdShop.getText()))
+            if ((bleAdShop.getText().toString().toLowerCase().contains(getResources().getString(R.string.ble_ad_shop_part_1).toLowerCase()))) {
 //                Log.d(LOG_TAG, "BLE AD SHOP IS EMPTY");
                 scanHandler.postDelayed(this, scan_interval_ms);
             } else {
@@ -273,14 +309,13 @@ public class ScanActivity extends AppCompatActivity {
                         String resBeaconLocation = response.body().getLocation();
                         final ArrayList<Offer> resBeaconOffers = response.body().getOffers();
 
-                        Log.d("POST BEACON API: ", "UUID:" + resBeaconUuid + " Message: " + resBeaconMessage + " Offers: " + resBeaconOffers.get(0).getImageUrl() + " STORE NAME: " + resBeaconOffers.get(0).getStoreName());
+//                        Log.d("POST BEACON API: ", "UUID:" + resBeaconUuid + " Message: " + resBeaconMessage + " Offers: " + resBeaconOffers.get(0).getImageUrl() + " STORE NAME: " + resBeaconOffers.get(0).getStoreName());
 
                         Beacon beacon = new Beacon(resBeaconUuid, resBeaconMessage, resBeaconLocation, resBeaconOffers);
 
 //                      TODO: remove hardcoded logic
                         if (!resBeaconLocation.equals("CCC")) {
                             TextView bleAdShop = (TextView) findViewById(R.id.bleAdShop);
-                            bleAdShop.setVisibility(View.VISIBLE);
                             bleAdShop.setText(resBeaconMessage);
                         }
                     }
